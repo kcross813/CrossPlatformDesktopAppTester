@@ -1,0 +1,17 @@
+name: Calculator Tests
+version: '1.0'
+description: UAT tests for the macOS Calculator application
+target_app:
+  name: Calculator
+  bundle_id: com.apple.calculator
+settings:
+  screenshot_on_failure: true
+  screenshot_on_step: false
+  default_timeout: 5.0
+  retry_count: 1
+  slow_mode_delay: 0.0
+directories:
+  tests: tests
+  fixtures: fixtures
+  screenshots: screenshots
+  reports: reports

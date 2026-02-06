@@ -1,0 +1,65 @@
+name: "Basic Addition"
+description: "Verify that 2 + 3 equals 5 in Calculator"
+tags:
+  - smoke
+  - arithmetic
+
+setup:
+  - id: setup_1
+    action: launch_app
+    description: "Launch Calculator"
+  - id: setup_2
+    action: wait_for_window
+    title: "Calculator"
+    timeout: 10
+  - id: setup_3
+    description: "Clear the calculator"
+    action: click
+    target:
+      type: accessibility_id
+      value: "AllClear"
+
+steps:
+  - id: step_1
+    description: "Click the 2 button"
+    action: click
+    target:
+      type: accessibility_id
+      value: "Two"
+
+  - id: step_2
+    description: "Click the + button"
+    action: click
+    target:
+      type: accessibility_id
+      value: "Add"
+
+  - id: step_3
+    description: "Click the 3 button"
+    action: click
+    target:
+      type: accessibility_id
+      value: "Three"
+
+  - id: step_4
+    description: "Click equals"
+    action: click
+    target:
+      type: accessibility_id
+      value: "Equals"
+
+  - id: step_5
+    description: "Verify result is 5"
+    action: assert
+    assertion:
+      type: element_text
+      target:
+        type: text_content
+        value: "5"
+      operator: equals
+      expected: "5"
+
+teardown:
+  - id: teardown_1
+    action: close_app
+    description: "Close Calculator"

@@ -1,0 +1,66 @@
+name: "Deliberate Failure"
+description: "Asserts 2 + 3 = 6 (wrong on purpose) to demonstrate failure screenshots"
+tags:
+  - demo
+  - failure
+
+setup:
+  - id: setup_1
+    action: launch_app
+    description: "Launch Calculator"
+  - id: setup_2
+    action: wait_for_window
+    title: "Calculator"
+    timeout: 10
+  - id: setup_3
+    description: "Clear the calculator"
+    action: click
+    target:
+      type: accessibility_id
+      value: "AllClear"
+
+steps:
+  - id: step_1
+    description: "Click the 2 button"
+    action: click
+    target:
+      type: accessibility_id
+      value: "Two"
+
+  - id: step_2
+    description: "Click the + button"
+    action: click
+    target:
+      type: accessibility_id
+      value: "Add"
+
+  - id: step_3
+    description: "Click the 3 button"
+    action: click
+    target:
+      type: accessibility_id
+      value: "Three"
+
+  - id: step_4
+    description: "Click equals"
+    action: click
+    target:
+      type: accessibility_id
+      value: "Equals"
+
+  - id: step_5
+    description: "Verify result is 6 (this will fail!)"
+    action: assert
+    screenshot: true
+    assertion:
+      type: element_text
+      target:
+        type: text_content
+        value: "5"
+      operator: equals
+      expected: "6"
+
+teardown:
+  - id: teardown_1
+    action: close_app
+    description: "Close Calculator"

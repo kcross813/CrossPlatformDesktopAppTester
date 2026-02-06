@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DesktopTester Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+        /* Header */
+        .header {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .header h1 {
+            color: #f0f6fc;
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        .header .meta {
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        /* Summary bar */
+        .summary {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .summary-card {
+            flex: 1;
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .summary-card .number {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .summary-card .label {
+            font-size: 12px;
+            color: #8b949e;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .summary-card.passed .number { color: #3fb950; }
+        .summary-card.failed .number { color: #f85149; }
+        .summary-card.errors .number { color: #d29922; }
+        .summary-card.total .number { color: #58a6ff; }
+        .summary-card.duration .number { color: #8b949e; font-size: 24px; }
+
+        /* Filter buttons */
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .filter-btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .filter-btn:hover { background: #30363d; }
+        .filter-btn.active { background: #388bfd26; border-color: #58a6ff; color: #58a6ff; }
+
+        /* Test cards */
+        .test-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        .test-header {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .test-header:hover { background: #1c2128; }
+        .test-status {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+        .status-passed { background: #23863626; color: #3fb950; }
+        .status-failed { background: #f8514926; color: #f85149; }
+        .status-error { background: #d2992226; color: #d29922; }
+        .test-name { flex: 1; font-weight: 600; font-size: 15px; }
+        .test-duration { color: #8b949e; font-size: 13px; }
+        .test-toggle { color: #8b949e; margin-left: 8px; font-size: 18px; }
+
+        /* Steps */
+        .test-steps {
+            border-top: 1px solid #30363d;
+            display: none;
+        }
+        .test-card.expanded .test-steps { display: block; }
+        .step-row {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            border-bottom: 1px solid #21262d;
+            font-size: 13px;
+        }
+        .step-row:last-child { border-bottom: none; }
+        .step-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .dot-passed { background: #3fb950; }
+        .dot-failed { background: #f85149; }
+        .dot-error { background: #d29922; }
+        .dot-skipped { background: #484f58; }
+        .step-id { color: #8b949e; width: 80px; flex-shrink: 0; }
+        .step-desc { flex: 1; }
+        .step-duration { color: #8b949e; width: 80px; text-align: right; }
+        .step-error {
+            padding: 8px 16px 8px 36px;
+            background: #f8514910;
+            color: #f85149;
+            font-size: 12px;
+            font-family: monospace;
+            border-bottom: 1px solid #21262d;
+        }
+
+        /* Screenshot */
+        .step-screenshot {
+            padding: 8px 16px 8px 36px;
+            border-bottom: 1px solid #21262d;
+        }
+        .step-screenshot img {
+            max-width: 100%;
+            border-radius: 4px;
+            border: 1px solid #30363d;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: #484f58;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>DesktopTester Report</h1>
+            <div class="meta">Generated: {{ generated_at }}</div>
+        </div>
+
+        <div class="summary">
+            <div class="summary-card total">
+                <div class="number">{{ summary.total }}</div>
+                <div class="label">Total</div>
+            </div>
+            <div class="summary-card passed">
+                <div class="number">{{ summary.passed }}</div>
+                <div class="label">Passed</div>
+            </div>
+            <div class="summary-card failed">
+                <div class="number">{{ summary.failed }}</div>
+                <div class="label">Failed</div>
+            </div>
+            <div class="summary-card errors">
+                <div class="number">{{ summary.errors }}</div>
+                <div class="label">Errors</div>
+            </div>
+            <div class="summary-card duration">
+                <div class="number">{{ "%.1f"|format(summary.duration_ms / 1000) }}s</div>
+                <div class="label">Duration</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterTests('all')">All</button>
+            <button class="filter-btn" onclick="filterTests('passed')">Passed</button>
+            <button class="filter-btn" onclick="filterTests('failed')">Failed</button>
+            <button class="filter-btn" onclick="filterTests('error')">Errors</button>
+        </div>
+
+        {% for test in summary.test_results %}
+        <div class="test-card" data-status="{{ test.status }}">
+            <div class="test-header" onclick="toggleTest(this)">
+                <span class="test-status status-{{ test.status }}">
+                    {{ test.status | upper }}
+                </span>
+                <span class="test-name">{{ test.test_name }}</span>
+                <span class="test-duration">{{ "%.0f"|format(test.duration_ms) }}ms</span>
+                <span class="test-toggle">+</span>
+            </div>
+            <div class="test-steps">
+                {% for step in test.step_results %}
+                <div class="step-row">
+                    <span class="step-status-dot dot-{{ step.status }}"></span>
+                    <span class="step-id">{{ step.step_id }}</span>
+                    <span class="step-desc">{{ step.status | upper }}</span>
+                    <span class="step-duration">{{ "%.0f"|format(step.duration_ms) }}ms</span>
+                </div>
+                {% if step.error_message %}
+                <div class="step-error">{{ step.error_message }}</div>
+                {% endif %}
+                {% if step.step_id in screenshots and screenshots[step.step_id] %}
+                <div class="step-screenshot">
+                    <img src="{{ screenshots[step.step_id] }}" alt="Screenshot for {{ step.step_id }}">
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="footer">
+            Generated by DesktopTester
+        </div>
+    </div>
+
+    <script>
+        function toggleTest(header) {
+            const card = header.closest('.test-card');
+            card.classList.toggle('expanded');
+            const toggle = header.querySelector('.test-toggle');
+            toggle.textContent = card.classList.contains('expanded') ? '−' : '+';
+        }
+
+        function filterTests(status) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.test-card').forEach(card => {
+                if (status === 'all' || card.dataset.status === status) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Auto-expand failed tests
+        document.querySelectorAll('.test-card[data-status="failed"], .test-card[data-status="error"]')
+            .forEach(card => {
+                card.classList.add('expanded');
+                card.querySelector('.test-toggle').textContent = '−';
+            });
+    </script>
+</body>
+</html>

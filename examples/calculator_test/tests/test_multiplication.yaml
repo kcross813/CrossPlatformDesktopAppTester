@@ -1,0 +1,62 @@
+name: Test Multiplication
+steps:
+- id: step_1
+  action: click
+  description: Click "All Clear" (button)
+  target:
+    type: accessibility_id
+    value: AllClear
+    fallback:
+      type: role_label
+      value: All Clear
+      role: button
+- id: step_2
+  action: click
+  description: Click "8" (button)
+  target:
+    type: accessibility_id
+    value: Eight
+    fallback:
+      type: role_label
+      value: '8'
+      role: button
+- id: step_3
+  action: click
+  description: Click "Multiply" (button)
+  target:
+    type: accessibility_id
+    value: Multiply
+    fallback:
+      type: role_label
+      value: Multiply
+      role: button
+- id: step_4
+  action: click
+  description: Click "8" (button)
+  target:
+    type: accessibility_id
+    value: Eight
+    fallback:
+      type: role_label
+      value: '8'
+      role: button
+- id: step_5
+  action: click
+  description: Click "Equals" (button)
+  target:
+    type: accessibility_id
+    value: Equals
+    fallback:
+      type: role_label
+      value: Equals
+      role: button
+- id: step_6
+  action: assert
+  description: New step 6
+  target:
+    type: accessibility_id
+    value: StandardInputView
+  assertion:
+    type: element_exists
+    operator: equals
+    expected: '64'

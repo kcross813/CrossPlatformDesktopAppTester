@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "desktop-tester"
+version = "0.1.0"
+description = "Desktop application UAT testing tool - Cypress-like experience for native apps"
+requires-python = ">=3.10"
+license = "MIT"
+
+dependencies = [
+    "PySide6>=6.6.0",
+    "click>=8.1.0",
+    "PyYAML>=6.0",
+    "pynput>=1.7.6",
+    "Jinja2>=3.1.0",
+    "Pillow>=10.0.0",
+    "platformdirs>=4.0.0",
+]
+
+[project.optional-dependencies]
+macos = [
+    "pyobjc-core>=10.0",
+    "pyobjc-framework-Cocoa>=10.0",
+    "pyobjc-framework-Quartz>=10.0",
+    "pyobjc-framework-ApplicationServices>=10.0",
+    "pyobjc-framework-Accessibility>=10.0",
+]
+windows = [
+    "pywinauto>=0.6.8",
+    "comtypes>=1.2.0",
+]
+vision = [
+    "opencv-python>=4.8.0",
+    "pyautogui>=0.9.54",
+]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-qt>=4.2.0",
+    "ruff>=0.1.0",
+    "mypy>=1.7.0",
+]
+
+[project.scripts]
+desktop-tester = "desktop_tester.cli.main:cli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/desktop_tester"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
