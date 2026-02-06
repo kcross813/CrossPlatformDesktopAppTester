@@ -19,6 +19,7 @@ class HTMLReporter:
             loader=PackageLoader("desktop_tester", "reporter/templates"),
             autoescape=select_autoescape(["html"]),
         )
+        self._env.filters["basename"] = lambda path: Path(path).name if path else ""
 
     def generate(self, summary: RunSummary, output_path: Path) -> Path:
         """Generate a self-contained HTML report."""

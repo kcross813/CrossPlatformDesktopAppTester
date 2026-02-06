@@ -579,12 +579,41 @@ class MainWindow(QMainWindow):
         if self._runner_worker and self._runner_worker.summary:
             summary = self._runner_worker.summary
             self._results_panel.set_run_summary(summary)
-            self._status_bar.showMessage(
-                f"Run complete: {summary.passed}/{summary.total} passed "
-                f"({summary.duration_ms:.0f}ms)"
-            )
+
+            # Generate HTML report
+            report_path = self._generate_html_report(summary)
+            if report_path:
+                self._status_bar.showMessage(
+                    f"Run complete: {summary.passed}/{summary.total} passed "
+                    f"({summary.duration_ms:.0f}ms) - Report: {report_path.name}"
+                )
+            else:
+                self._status_bar.showMessage(
+                    f"Run complete: {summary.passed}/{summary.total} passed "
+                    f"({summary.duration_ms:.0f}ms)"
+                )
         else:
             self._status_bar.showMessage("Run complete")
+
+    def _generate_html_report(self, summary) -> Path | None:
+        """Generate an HTML report and return the path, or None on failure."""
+        if not self._project_dir or not self._project_config:
+            return None
+        try:
+            from datetime import datetime
+
+            from desktop_tester.reporter.reporter import ReportGenerator
+
+            report_dir = self._project_dir / self._project_config.reports_dir
+            report_dir.mkdir(parents=True, exist_ok=True)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            report_path = report_dir / f"report_{timestamp}.html"
+
+            generator = ReportGenerator()
+            generator.generate_html(summary, report_path)
+            return report_path
+        except Exception:
+            return None
 
     # --- Target app selection ---
 

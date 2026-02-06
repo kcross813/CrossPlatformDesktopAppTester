@@ -89,6 +89,7 @@ class StepResult:
     step_id: str
     status: str  # "passed", "failed", "skipped", "error"
     duration_ms: float = 0.0
+    description: str = ""
     error_message: Optional[str] = None
     screenshot_path: Optional[str] = None
     actual_value: Optional[str] = None

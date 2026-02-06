@@ -56,6 +56,7 @@ class StepExecutor:
                     step_id=step.id,
                     status="error",
                     duration_ms=(time.time() - start) * 1000,
+                    description=step.description,
                     error_message=f"Unknown action: {step.action}",
                 )
 
@@ -65,7 +66,10 @@ class StepExecutor:
             if context.slow_mode_delay > 0:
                 time.sleep(context.slow_mode_delay)
 
-            return StepResult(step_id=step.id, status="passed", duration_ms=duration)
+            return StepResult(
+                step_id=step.id, status="passed",
+                duration_ms=duration, description=step.description,
+            )
 
         except Exception as e:
             duration = (time.time() - start) * 1000
@@ -73,6 +77,7 @@ class StepExecutor:
                 step_id=step.id,
                 status="failed",
                 duration_ms=duration,
+                description=step.description,
                 error_message=str(e),
             )
 

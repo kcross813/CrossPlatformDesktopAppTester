@@ -22,10 +22,12 @@ class AssertionExecutor:
         """Evaluate an assertion step and return the result."""
         start = time.time()
         assertion = step.assertion
+        desc = step.description
         if not assertion:
             return StepResult(
                 step_id=step.id,
                 status="error",
+                description=desc,
                 error_message="Assertion step has no assertion definition",
                 duration_ms=0,
             )
@@ -45,14 +47,14 @@ class AssertionExecutor:
                 actual = self._assert_element_text(target, assertion)
                 duration = (time.time() - start) * 1000
                 return StepResult(
-                    step_id=step.id, status="passed",
+                    step_id=step.id, status="passed", description=desc,
                     duration_ms=duration, actual_value=actual,
                 )
             elif assertion_type == AssertionType.ELEMENT_VALUE:
                 actual = self._assert_element_value(target, assertion)
                 duration = (time.time() - start) * 1000
                 return StepResult(
-                    step_id=step.id, status="passed",
+                    step_id=step.id, status="passed", description=desc,
                     duration_ms=duration, actual_value=actual,
                 )
             elif assertion_type == AssertionType.ELEMENT_ENABLED:
@@ -63,23 +65,26 @@ class AssertionExecutor:
                 actual = self._assert_element_count(target, assertion)
                 duration = (time.time() - start) * 1000
                 return StepResult(
-                    step_id=step.id, status="passed",
+                    step_id=step.id, status="passed", description=desc,
                     duration_ms=duration, actual_value=str(actual),
                 )
             else:
                 return StepResult(
-                    step_id=step.id, status="error",
+                    step_id=step.id, status="error", description=desc,
                     error_message=f"Unsupported assertion type: {assertion_type}",
                     duration_ms=(time.time() - start) * 1000,
                 )
 
             duration = (time.time() - start) * 1000
-            return StepResult(step_id=step.id, status="passed", duration_ms=duration)
+            return StepResult(
+                step_id=step.id, status="passed",
+                duration_ms=duration, description=desc,
+            )
 
         except DTAssertionError as e:
             duration = (time.time() - start) * 1000
             return StepResult(
-                step_id=step.id, status="failed",
+                step_id=step.id, status="failed", description=desc,
                 duration_ms=duration,
                 error_message=str(e),
                 actual_value=str(e.actual) if e.actual is not None else None,
@@ -87,7 +92,7 @@ class AssertionExecutor:
         except Exception as e:
             duration = (time.time() - start) * 1000
             return StepResult(
-                step_id=step.id, status="error",
+                step_id=step.id, status="error", description=desc,
                 duration_ms=duration, error_message=str(e),
             )
 
