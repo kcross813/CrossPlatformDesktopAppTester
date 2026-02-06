@@ -94,6 +94,11 @@ class PlatformBackend(ABC):
         """Return list of running apps with name, pid, bundle_id."""
         ...
 
+    def type_keys(self, text: str) -> None:
+        """Type text into the currently focused element via keyboard events."""
+        for char in text:
+            self.perform_key_combo([char])
+
     # --- Screenshots ---
 
     @abstractmethod

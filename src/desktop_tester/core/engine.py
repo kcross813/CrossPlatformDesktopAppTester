@@ -74,6 +74,10 @@ class AutomationEngine:
     def type_text(self, element: UIElement, text: str) -> None:
         self._backend.perform_type_text(element, text)
 
+    def type_keys(self, text: str) -> None:
+        """Type text into the focused element via keyboard events (no target needed)."""
+        self._backend.type_keys(text)
+
     def key_combo(self, keys: list[str]) -> None:
         self._backend.perform_key_combo(keys)
 

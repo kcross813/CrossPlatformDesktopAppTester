@@ -44,6 +44,15 @@ class EventToStep:
         self, step_id: str, event: RawEvent,
         element: UIElement | None, locator_dict: dict | None
     ) -> Step:
+        # Dock item clicks should become launch_app steps
+        if element is not None and element.role == "dockitem":
+            app_name = element.title or element.label or "Unknown"
+            return Step(
+                id=step_id,
+                action=ActionType.LAUNCH_APP,
+                description=f"Launch {app_name}",
+            )
+
         desc = self._describe_element("Click", element)
         return Step(
             id=step_id,

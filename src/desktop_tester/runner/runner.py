@@ -20,7 +20,7 @@ from desktop_tester.runner.step_executor import StepExecutor
 class TestRunner(QObject):
     """Executes test files and emits progress signals for the GUI."""
 
-    test_started = Signal(str)       # test_name
+    test_started = Signal(str, str)  # test_name, test_path
     step_started = Signal(str)       # step_id
     step_completed = Signal(object)  # StepResult
     test_completed = Signal(object)  # TestResult
@@ -54,7 +54,7 @@ class TestRunner(QObject):
         test_data = load_test_file(test_path)
         test_name = test_data["name"]
 
-        self.test_started.emit(test_name)
+        self.test_started.emit(test_name, str(test_path))
         self._hooks.emit("before_test", test_name)
 
         context = RunContext(self._project_dir, self._config, test_path)

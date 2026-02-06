@@ -220,16 +220,28 @@ class MainWindow(QMainWindow):
     # --- Project operations ---
 
     def _new_project(self) -> None:
-        dialog = NewProjectDialog(self)
+        apps = self._get_installed_apps()
+        dialog = NewProjectDialog(apps=apps, parent=self)
         if dialog.exec() != NewProjectDialog.Accepted:
             return
 
         project_dir = dialog.project_directory / dialog.project_name.replace(" ", "_").lower()
         project_dir.mkdir(parents=True, exist_ok=True)
 
+        # Build TargetApp from selection or manual text entry
+        if dialog.selected_app:
+            target_app = TargetApp(
+                bundle_id=dialog.selected_app.get("bundle_id", ""),
+                name=dialog.selected_app.get("name", ""),
+            )
+        elif dialog.target_app:
+            target_app = TargetApp(bundle_id=dialog.target_app)
+        else:
+            target_app = TargetApp()
+
         config = ProjectConfig(
             name=dialog.project_name,
-            target_app=TargetApp(bundle_id=dialog.target_app) if dialog.target_app else TargetApp(),
+            target_app=target_app,
         )
 
         # Create directory structure
@@ -555,8 +567,19 @@ class MainWindow(QMainWindow):
         self._runner_worker.finished.connect(self._on_run_finished)
         self._runner_worker.start()
 
-    def _on_test_started(self, test_name: str) -> None:
+    def _on_test_started(self, test_name: str, test_path: str) -> None:
         self._results_panel.add_test_header(test_name)
+        # Load the test steps into the step list so the command log shows them
+        path = Path(test_path)
+        try:
+            test_data = load_test_file(path)
+            self._current_test_path = path
+            steps = test_data.get("steps", [])
+            self._step_list.model.set_steps(steps)
+            self._step_list.model.clear_results()
+            self._step_list.set_status(f"Running: {test_name}")
+        except Exception:
+            pass
 
     def _on_run_step_started(self, step_id: str) -> None:
         self._step_list.model.set_current_step(step_id)
@@ -616,6 +639,17 @@ class MainWindow(QMainWindow):
             return None
 
     # --- Target app selection ---
+
+    def _get_installed_apps(self) -> list[dict]:
+        """Return installed applications, falling back to an empty list."""
+        try:
+            import sys
+            if sys.platform == "darwin":
+                from desktop_tester.core.macos_backend import MacOSBackend
+                return MacOSBackend.list_installed_applications()
+        except Exception:
+            pass
+        return []
 
     def _select_target_app(self) -> None:
         if not self._ensure_engine():

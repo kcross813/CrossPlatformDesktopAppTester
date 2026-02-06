@@ -93,6 +93,12 @@ class StepExecutor:
         return self._engine.find_element(locator)
 
     def _do_click(self, step: Step, context: RunContext) -> None:
+        # Dock item clicks can't be resolved inside the target app's tree;
+        # treat them as app activation instead.
+        if step.target and step.target.get("role") == "dockitem":
+            self._engine.launch_app(context.config.target_app)
+            return
+
         element = self._resolve_target(step, context)
         self._engine.click(element)
 
@@ -105,10 +111,14 @@ class StepExecutor:
         self._engine.right_click(element)
 
     def _do_type_text(self, step: Step, context: RunContext) -> None:
-        element = self._resolve_target(step, context)
         if not step.text:
             raise ValueError(f"Step {step.id} type_text has no text defined")
-        self._engine.type_text(element, step.text)
+        if step.target:
+            element = self._resolve_target(step, context)
+            self._engine.type_text(element, step.text)
+        else:
+            # No target: type into whatever currently has focus
+            self._engine.type_keys(step.text)
 
     def _do_key_combo(self, step: Step) -> None:
         if not step.keys:

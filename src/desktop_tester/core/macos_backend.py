@@ -263,6 +263,12 @@ class MacOSBackend(PlatformBackend):
             self._type_char(char)
             time.sleep(0.02)
 
+    def type_keys(self, text: str) -> None:
+        """Type text into the currently focused element via keyboard events."""
+        for char in text:
+            self._type_char(char)
+            time.sleep(0.02)
+
     def perform_key_combo(self, keys: list[str]) -> None:
         modifiers: list[str] = []
         regular_keys: list[str] = []
@@ -378,6 +384,52 @@ class MacOSBackend(PlatformBackend):
                     "pid": app.processIdentifier(),
                     "bundle_id": str(app.bundleIdentifier() or ""),
                 })
+        return sorted(result, key=lambda x: x["name"])
+
+    @staticmethod
+    def list_installed_applications() -> list[dict]:
+        """Return list of installed apps with name and bundle_id.
+
+        Scans /Applications and ~/Applications for .app bundles.
+        """
+        import plistlib
+        from pathlib import Path
+
+        search_dirs = [
+            Path("/Applications"),
+            Path.home() / "Applications",
+        ]
+
+        result = []
+        seen_bundle_ids: set[str] = set()
+
+        for search_dir in search_dirs:
+            if not search_dir.is_dir():
+                continue
+            for app_path in search_dir.glob("**/*.app"):
+                plist_path = app_path / "Contents" / "Info.plist"
+                if not plist_path.exists():
+                    continue
+                try:
+                    with open(plist_path, "rb") as f:
+                        plist = plistlib.load(f)
+                    bundle_id = plist.get("CFBundleIdentifier", "")
+                    name = (
+                        plist.get("CFBundleName")
+                        or plist.get("CFBundleDisplayName")
+                        or app_path.stem
+                    )
+                    if bundle_id and bundle_id in seen_bundle_ids:
+                        continue
+                    if bundle_id:
+                        seen_bundle_ids.add(bundle_id)
+                    result.append({
+                        "name": str(name),
+                        "bundle_id": str(bundle_id),
+                    })
+                except Exception:
+                    continue
+
         return sorted(result, key=lambda x: x["name"])
 
     # --- Screenshots ---
