@@ -125,11 +125,6 @@ class MainWindow(QMainWindow):
 
         # File menu
         file_menu = menu_bar.addMenu("File")
-        file_menu.addAction("New Project...", self._new_project)
-        file_menu.addAction("Open Project...", self._open_project)
-        file_menu.addSeparator()
-        file_menu.addAction("New Test...", self._new_test)
-        file_menu.addSeparator()
         file_menu.addAction("Save", self._save_current_test, "Ctrl+S")
         file_menu.addSeparator()
         file_menu.addAction("Exit", self.close)
@@ -162,6 +157,9 @@ class MainWindow(QMainWindow):
         # Test explorer
         self._test_explorer.test_selected.connect(self._load_test_file)
         self._test_explorer.test_deleted.connect(self._on_test_deleted)
+        self._test_explorer.new_project_requested.connect(self._new_project)
+        self._test_explorer.open_project_requested.connect(self._open_project)
+        self._test_explorer.new_test_requested.connect(self._new_test)
 
         # Step list
         self._step_list.step_selected.connect(self._on_step_selected)

@@ -5,7 +5,16 @@ from __future__ import annotations
 from pathlib import Path
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QMenu, QMessageBox, QTreeView, QVBoxLayout, QWidget, QLabel
+from PySide6.QtWidgets import (
+    QHBoxLayout,
+    QLabel,
+    QMenu,
+    QMessageBox,
+    QPushButton,
+    QTreeView,
+    QVBoxLayout,
+    QWidget,
+)
 
 from desktop_tester.gui.models.test_tree_model import TestTreeModel
 
@@ -15,6 +24,9 @@ class TestExplorer(QWidget):
 
     test_selected = Signal(object)  # Path
     test_deleted = Signal(object)  # Path
+    new_project_requested = Signal()
+    open_project_requested = Signal()
+    new_test_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -31,6 +43,40 @@ class TestExplorer(QWidget):
             "font-size: 11px; color: #888; border-bottom: 1px solid #444;"
         )
         layout.addWidget(header)
+
+        # Action buttons
+        btn_style = (
+            "QPushButton { background: #2a2a2a; border: 1px solid #444; "
+            "color: #ccc; padding: 5px 8px; border-radius: 3px; font-size: 12px; }"
+            "QPushButton:hover { background: #3a3a3a; border-color: #58a6ff; }"
+        )
+
+        project_row = QHBoxLayout()
+        project_row.setContentsMargins(6, 6, 6, 0)
+        project_row.setSpacing(4)
+
+        new_project_btn = QPushButton("New Project")
+        new_project_btn.setStyleSheet(btn_style)
+        new_project_btn.clicked.connect(self.new_project_requested)
+        project_row.addWidget(new_project_btn)
+
+        open_project_btn = QPushButton("Open Project")
+        open_project_btn.setStyleSheet(btn_style)
+        open_project_btn.clicked.connect(self.open_project_requested)
+        project_row.addWidget(open_project_btn)
+
+        layout.addLayout(project_row)
+
+        test_row = QHBoxLayout()
+        test_row.setContentsMargins(6, 4, 6, 6)
+        test_row.setSpacing(4)
+
+        new_test_btn = QPushButton("+ New Test")
+        new_test_btn.setStyleSheet(btn_style)
+        new_test_btn.clicked.connect(self.new_test_requested)
+        test_row.addWidget(new_test_btn)
+
+        layout.addLayout(test_row)
 
         # Tree view
         self._tree = QTreeView()
