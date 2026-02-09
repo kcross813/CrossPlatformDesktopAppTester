@@ -70,7 +70,7 @@ class RecordingSession(QObject):
         if not self._is_recording:
             return
 
-        # Resolve the element under the cursor for mouse events
+        # Resolve the relevant UI element
         element = None
         locator_dict = None
         if event.event_type in (
@@ -79,6 +79,10 @@ class RecordingSession(QObject):
             RawEventType.MOUSE_RIGHT_CLICK,
         ):
             element, locator = self._element_resolver.resolve(event.x, event.y)
+            if locator:
+                locator_dict = locator.to_dict()
+        elif event.event_type == RawEventType.KEY_PRESS:
+            element, locator = self._element_resolver.resolve_focused()
             if locator:
                 locator_dict = locator.to_dict()
 

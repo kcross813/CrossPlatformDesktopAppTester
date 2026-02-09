@@ -13,6 +13,18 @@ class ElementResolver:
     def __init__(self, engine: AutomationEngine):
         self._engine = engine
 
+    def resolve_focused(self) -> tuple[UIElement | None, LocatorStrategy | None]:
+        """Resolve the currently focused element and generate a locator for it.
+
+        Returns (element, locator) or (None, None) if no focused element.
+        """
+        element = self._engine.get_focused_element()
+        if element is None:
+            return None, None
+
+        locator = self._build_locator(element)
+        return element, locator
+
     def resolve(self, x: int, y: int) -> tuple[UIElement | None, LocatorStrategy | None]:
         """Resolve the element at (x, y) and generate the best locator for it.
 

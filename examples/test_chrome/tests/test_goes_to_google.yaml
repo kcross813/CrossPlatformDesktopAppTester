@@ -1,0 +1,27 @@
+name: Test Goes To Google
+steps:
+- id: step_1
+  action: launch_app
+  description: Launch Google Chrome
+- id: step_2
+  action: type_text
+  description: Type "hello world" in "Address Bar" (text_field)
+  target:
+    type: role_title
+    value: Address Bar
+    role: text_field
+  text: hello world
+- id: step_3
+  action: key_combo
+  description: Press Return
+  keys:
+  - return
+- id: step_4
+  action: assert
+  description: Verify "hello world" is visible
+  target:
+    type: text_content
+    value: hello world
+  assertion:
+    type: element_exists
+    operator: equals

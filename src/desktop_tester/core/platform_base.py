@@ -36,6 +36,13 @@ class PlatformBackend(ABC):
         """Return the accessibility tree as a nested dict."""
         ...
 
+    def get_focused_element(self, app_ref: object) -> UIElement | None:
+        """Get the UI element that currently has keyboard focus.
+
+        Returns None if no element is focused or focus cannot be determined.
+        """
+        return None
+
     def get_element_text(self, element: UIElement) -> str:
         """Get the visible text content of an element, including its children.
 

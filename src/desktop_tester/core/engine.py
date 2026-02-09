@@ -54,6 +54,12 @@ class AutomationEngine:
             raise RuntimeError("Not connected to any application")
         return self._backend.find_elements(self._app_manager.app_ref, locator)
 
+    def get_focused_element(self) -> UIElement | None:
+        """Get the UI element that currently has keyboard focus."""
+        if not self._app_manager.is_connected:
+            return None
+        return self._backend.get_focused_element(self._app_manager.app_ref)
+
     def get_element_at_point(self, x: int, y: int) -> UIElement | None:
         """Get the UI element at the given screen coordinates."""
         return self._backend.get_element_at_point(x, y)

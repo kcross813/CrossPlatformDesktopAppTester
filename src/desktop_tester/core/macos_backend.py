@@ -163,6 +163,12 @@ class MacOSBackend(PlatformBackend):
             return None
         return self._wrap_native_element(native_element)
 
+    def get_focused_element(self, app_ref: object) -> UIElement | None:
+        focused = _ax_attr(app_ref, "AXFocusedUIElement")
+        if focused is None:
+            return None
+        return self._wrap_native_element(focused)
+
     def get_element_text(self, element: UIElement) -> str:
         """Get visible text from an element, walking children if needed."""
         # Try the element's own text first

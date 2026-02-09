@@ -1,0 +1,17 @@
+name: test chrome
+version: '1.0'
+description: ''
+target_app:
+  bundle_id: com.google.Chrome
+  name: Chrome
+settings:
+  screenshot_on_failure: true
+  screenshot_on_step: false
+  default_timeout: 5.0
+  retry_count: 1
+  slow_mode_delay: 0.0
+directories:
+  tests: tests
+  fixtures: fixtures
+  screenshots: screenshots
+  reports: reports

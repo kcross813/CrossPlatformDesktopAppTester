@@ -346,9 +346,10 @@
                 {% if step.error_message %}
                 <div class="step-error">{{ step.error_message }}</div>
                 {% endif %}
-                {% if step.step_id in screenshots and screenshots[step.step_id] %}
+                {% set screenshot_key = test.test_file ~ ":" ~ step.step_id %}
+                {% if screenshot_key in screenshots and screenshots[screenshot_key] %}
                 <div class="step-screenshot">
-                    <img src="{{ screenshots[step.step_id] }}"
+                    <img src="{{ screenshots[screenshot_key] }}"
                          alt="Screenshot for {{ step.step_id }}"
                          onclick="openLightbox(this.src)">
                 </div>

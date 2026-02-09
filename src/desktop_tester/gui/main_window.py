@@ -502,6 +502,7 @@ class MainWindow(QMainWindow):
             return
 
         steps = self._recorder.stop()
+        self._step_list.model.set_steps(steps)
         self._toolbar.set_recording_state(False)
         self._step_list.set_status(f"Recorded {len(steps)} steps")
         self._status_bar.showMessage(

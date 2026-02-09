@@ -25,14 +25,16 @@ class HTMLReporter:
         """Generate a self-contained HTML report."""
         template = self._env.get_template("report.html.j2")
 
-        # Encode screenshots as base64 for embedding
+        # Encode screenshots as base64 for embedding (only for failed/errored tests)
         screenshot_data: dict[str, str] = {}
         for test_result in summary.test_results:
-            for step_result in test_result.step_results:
-                if step_result.screenshot_path:
-                    screenshot_data[step_result.step_id] = self._encode_screenshot(
-                        step_result.screenshot_path
-                    )
+            if test_result.status in ("failed", "error"):
+                for step_result in test_result.step_results:
+                    if step_result.screenshot_path:
+                        key = f"{test_result.test_file}:{step_result.step_id}"
+                        screenshot_data[key] = self._encode_screenshot(
+                            step_result.screenshot_path
+                        )
 
         html = template.render(
             summary=summary,

@@ -52,7 +52,7 @@ steps:
       role: button
 - id: step_6
   action: assert
-  description: New step 6
+  description: Verify result is "64" in "StandardInputView"
   target:
     type: accessibility_id
     value: StandardInputView

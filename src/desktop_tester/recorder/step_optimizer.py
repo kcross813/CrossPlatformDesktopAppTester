@@ -40,11 +40,17 @@ class StepOptimizer:
     def _collapse_type_buffer(self, buffer: list[Step]) -> Step:
         """Collapse a buffer of single-char TYPE_TEXT steps into one."""
         text = "".join(s.text for s in buffer if s.text)
+        target = buffer[0].target
+        desc = f'Type "{text}"'
+        if target:
+            element_name = target.get("value", "")
+            if element_name:
+                desc = f'{desc} in "{element_name}"'
         return Step(
             id="",
             action=ActionType.TYPE_TEXT,
-            description=f'Type "{text}"',
-            target=buffer[0].target,
+            description=desc,
+            target=target,
             text=text,
         )
 

@@ -89,19 +89,21 @@ class EventToStep:
         self, step_id: str, event: RawEvent,
         element: UIElement | None, locator_dict: dict | None
     ) -> Step:
+        element_suffix = self._element_suffix(element)
         if event.modifiers:
             # Key combo (e.g., Cmd+C)
             keys = list(event.modifiers) + [event.key]
-            desc = f'Key combo: {"+".join(keys)}'
+            desc = f'Key combo: {"+".join(keys)}{element_suffix}'
             return Step(
                 id=step_id,
                 action=ActionType.KEY_COMBO,
                 description=desc,
+                target=locator_dict,
                 keys=keys,
             )
         else:
             # Single character typed
-            desc = f'Type "{event.key}"'
+            desc = f'Type "{event.key}"{element_suffix}'
             return Step(
                 id=step_id,
                 action=ActionType.TYPE_TEXT,
@@ -119,3 +121,15 @@ class EventToStep:
         if name:
             return f'{verb} "{name}" ({element.role})'
         return f"{verb} {element.role}"
+
+    def _element_suffix(self, element: UIElement | None) -> str:
+        """Generate an ' in "Name" (role)' suffix for an element, or empty string."""
+        if element is None:
+            return ""
+
+        name = element.title or element.label or element.identifier
+        if name:
+            return f' in "{name}" ({element.role})'
+        if element.role:
+            return f" in {element.role}"
+        return ""
